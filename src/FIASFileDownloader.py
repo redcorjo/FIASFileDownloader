@@ -4,6 +4,8 @@ from urllib2 import urlopen, URLError, HTTPError
 import time
 import re
 import argparse
+# https://pypi.python.org/pypi/rarfile
+import rarfile
 
 def checkFiles():
     url = "http://fias.nalog.ru/WebServices/Public/DownloadService.asmx?WSDL"
@@ -62,6 +64,7 @@ def downloadLastDelta(url=""):
     filename = url_delta.split("/")[-1]
     print "Downloading last delta {0}".format(url_delta)
     downloadLargeFile(url_delta, filename)
+    unrarFile(downloadpath + "/" + filename)
     pass
 
 def downloadLastFull(url=""):
@@ -74,6 +77,7 @@ def downloadLastFull(url=""):
     #downloadfile(url_full, filename)
     print "Downloading last full {0}".format(url_full)
     downloadLargeFile(url_full, filename)
+    unrarFile(downloadpath + "/" + filename)
     pass
 
 def downloadfile(url, filename):
@@ -103,7 +107,7 @@ def downloadLargeFile(url, filename):
     baseFile = os.path.basename(url)
 
     # move the file to a more uniq path
-    os.umask(0002)
+    #os.umask(0002)
     #temp_path = "./downloads"
     temp_path = downloadpath
     if not os.path.exists(temp_path):
@@ -152,6 +156,19 @@ def downloadLargeFile(url, filename):
 
     return file
 
+def unrarFile(filename):
+    rf = rarfile.RarFile(filename)
+    for f in rf.infolist():
+        print f.filename, f.file_size
+        try:
+            rf.extract(f.filename,path=downloadpath)
+        except Exception,e:
+            print "Exception {0} for file {1}".format(str(e),f.filename)
+        #print(rf.read(f))
+        # if f.filename == 'README':
+        #     print(rf.read(f))
+    rf.close()
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--version', action='version', version='%(prog)s 0.2')
@@ -181,7 +198,7 @@ def main():
         results = p.search(html_string)
         version = results.group(1)
 
-        print "Lst Version:{0} Lastfull:{1} Lastdelta:{2}".format(version, urllastfull, urllastfull)
+        print "Last Version:{0} Lastfull:{1} Lastdelta:{2}".format(version, urllastfull, urllastfull)
 
     if args.downloaddelta:
         downloadLastDelta(url=urllastdelta)
