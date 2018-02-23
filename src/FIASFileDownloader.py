@@ -124,7 +124,6 @@ def downloadLargeFile(url, filename):
                 chunk = req.read(CHUNK)
                 currenttime = time.time()
                 deltatime = int (currenttime - baselinetime)
-                percentage = int (( float(downloaded) / float(total_size) ) * 100.00 )
                 percentage = float((float(downloaded) / float(total_size)) * 100.00)
                 if percentage > 0:
                     totaltime = int (( float(deltatime) / float(percentage) ) * 100.00)
@@ -154,8 +153,8 @@ def downloadLargeFile(url, filename):
     return file
 
 def main():
-    print "main"
     parser = argparse.ArgumentParser()
+    parser.add_argument('--version', action='version', version='%(prog)s 0.2')
     parser.add_argument("-df","--downloadfull", help="Download Full database", action="store_true")
     parser.add_argument("-dd","--downloaddelta", help="Download last delta database", action="store_true")
     parser.add_argument("-x", "--proxy", help="HTTP Proxy in format <hostname>:<port>", nargs='?', type=str)
@@ -168,24 +167,28 @@ def main():
     global proxy
     proxy = args.proxy
 
-    html_string = checkFiles()
-    p = re.compile(r".+FiasCompleteXmlUrl>(http://[^<]+)</.+", re.IGNORECASE)
-    results = p.search(html_string)
-    urllastfull = results.group(1)
+    if args.downloaddelta or args.downloadfull:
+        html_string = checkFiles()
+        p = re.compile(r".+FiasCompleteXmlUrl>(http://[^<]+)</.+", re.IGNORECASE)
+        results = p.search(html_string)
+        urllastfull = results.group(1)
 
-    p = re.compile(r".+FiasDeltaXmlUrl>(http://[^<]+)</.+", re.IGNORECASE)
-    results = p.search(html_string)
-    urllastdelta = results.group(1)
+        p = re.compile(r".+FiasDeltaXmlUrl>(http://[^<]+)</.+", re.IGNORECASE)
+        results = p.search(html_string)
+        urllastdelta = results.group(1)
 
-    p = re.compile(r".+VersionId>([0-9]+)</.+", re.IGNORECASE)
-    results = p.search(html_string)
-    version = results.group(1)
+        p = re.compile(r".+VersionId>([0-9]+)</.+", re.IGNORECASE)
+        results = p.search(html_string)
+        version = results.group(1)
 
-    print "Lst Version:{0} Lastfull:{1} Lastdelta:{2}".format(version, urllastfull, urllastfull)
+        print "Lst Version:{0} Lastfull:{1} Lastdelta:{2}".format(version, urllastfull, urllastfull)
+
     if args.downloaddelta:
         downloadLastDelta(url=urllastdelta)
+
     if args.downloadfull:
         downloadLastFull(url=urllastfull)
+
     pass
 
 if __name__ == "__main__":
