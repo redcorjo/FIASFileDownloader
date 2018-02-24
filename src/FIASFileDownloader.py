@@ -144,8 +144,8 @@ def downloadLargeFile(url, filename):
                     #pass
                     break
                 if downloaded == total_size:
-                    print "Complete downloaded"
-                    break
+                    print "Download completed"
+                    #break
                 fp.write(chunk)
     except urllib2.HTTPError, e:
         print "HTTP Error:", e.code, url
