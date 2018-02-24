@@ -140,12 +140,12 @@ def downloadLargeFile(url, filename):
                     remainingtime = "N/A"
                 downloaded += len(chunk)
                 print "Total size:{0}bytes Downloaded:{1}bytes - Downloaded Percentage:{2}% TimeElapsed:{3}s TotalExpectedtime:{4}s RemainingTime:{5}s ".format(total_size, downloaded, int(percentage), deltatime, totaltime, remainingtime )
-                if not chunk:
-                    #pass
-                    break
-                if downloaded == total_size:
+                if not chunk and downloaded == total_size:
                     print "Download completed"
-                    #break
+                    break
+                elif not chunk and not downloaded == total_size:
+                    print "Cancelled transfer"
+                    break
                 fp.write(chunk)
     except urllib2.HTTPError, e:
         print "HTTP Error:", e.code, url
@@ -169,6 +169,17 @@ def unrarFile(filename):
         #     print(rf.read(f))
     rf.close()
 
+
+def cleanupOldFiles(aging=40):
+    print "Purging files older than {0} days from folder {1}".format(aging, downloadpath)
+    if os.path.exists(downloadpath) and os.path.isdir(downloadpath):
+        now = time.time()
+        for myfile in os.listdir(downloadpath):
+            if os.stat(os.path.join(downloadpath, myfile)).st_mtime < now - aging * 86400:
+                print "Delete file {0}".format(myfile)
+    else:
+        print "Path not valid"
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--version', action='version', version='%(prog)s 0.2')
@@ -176,6 +187,8 @@ def main():
     parser.add_argument("-dd","--downloaddelta", help="Download last delta database", action="store_true")
     parser.add_argument("-x", "--proxy", help="HTTP Proxy in format <hostname>:<port>", nargs='?', type=str)
     parser.add_argument("-p", "--path", help="Path to keep files", nargs='?', const="downloads", type=str, default="downloads")
+    parser.add_argument("-d", "--delete", help="Delete files (default 30 days)", nargs='?', const=30, type=int,
+                        default=30)
     args = parser.parse_args()
 
     global downloadpath
@@ -183,6 +196,8 @@ def main():
 
     global proxy
     proxy = args.proxy
+
+    aging = args.delete
 
     if args.downloaddelta or args.downloadfull:
         html_string = checkFiles()
@@ -205,6 +220,8 @@ def main():
 
     if args.downloadfull:
         downloadLastFull(url=urllastfull)
+
+    cleanupOldFiles(aging=aging)
 
     pass
 
