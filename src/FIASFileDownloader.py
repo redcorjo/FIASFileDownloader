@@ -38,17 +38,21 @@ def checkFiles():
     # opener = urllib2.build_opener(proxy)
     # urllib2.install_opener(opener)
     # # #END OF --> IF YOU ARE NOT BEHIND A PROXY, DELETE THIS BLOCK
-    if proxy:
+    if myproxy:
         useProxy()
 
-    response = urllib2.urlopen(request_object)
-    html_string = response.read()
+    try:
+        response = urllib2.urlopen(request_object)
+        html_string = response.read()
+    except Exception,e:
+        print "Error downloading from url. Error code: {0}".format(str(e))
+        html_string = ""
     return html_string
 
 def useProxy():
     # #IF YOU ARE NOT BEHIND A PROXY, DELETE THIS BLOCK
-    http_proxy_server = "127.0.0.1"
-    http_proxy_port = "3128"
+    http_proxy_server = myproxy.split(":")[0]
+    http_proxy_port = myproxy.split(":")[1]
     http_proxy_realm = http_proxy_server
     http_proxy_full_auth_string = "http://%s:%s" % (http_proxy_server, http_proxy_port)
     proxy = urllib2.ProxyHandler({'http': http_proxy_full_auth_string})
@@ -117,7 +121,7 @@ def downloadLargeFile(url, filename):
         #file = os.path.join(temp_path, baseFile)
         file = os.path.join(temp_path, filename)
 
-        if proxy:
+        if myproxy:
             useProxy()
         req = urllib2.urlopen(url)
         total_size = int(req.info().getheader('Content-Length').strip())
@@ -175,50 +179,60 @@ def cleanupOldFiles(aging=40):
     if os.path.exists(downloadpath) and os.path.isdir(downloadpath):
         now = time.time()
         for myfile in os.listdir(downloadpath):
-            if os.stat(os.path.join(downloadpath, myfile)).st_mtime < now - aging * 86400:
-                print "Delete file {0}".format(myfile)
+            if os.stat(os.path.join(downloadpath, myfile)).st_mtime < now - aging * 86400 and \
+                    ( myfile.lower().endswith("xml") or myfile.lower().endswith("rar") ):
+                filetodelete = os.path.join(downloadpath, myfile)
+                print "Delete file {0}".format(filetodelete)
+                os.remove(filetodelete)
+
     else:
         print "Path not valid"
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--version', action='version', version='%(prog)s 0.2')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.3')
     parser.add_argument("-df","--downloadfull", help="Download Full database", action="store_true")
     parser.add_argument("-dd","--downloaddelta", help="Download last delta database", action="store_true")
+    parser.add_argument("-da", "--downloadall", help="Download last Full and last Delta database", action="store_true")
     parser.add_argument("-x", "--proxy", help="HTTP Proxy in format <hostname>:<port>", nargs='?', type=str)
     parser.add_argument("-p", "--path", help="Path to keep files", nargs='?', const="downloads", type=str, default="downloads")
-    parser.add_argument("-d", "--delete", help="Delete files (default 30 days)", nargs='?', const=30, type=int,
+    parser.add_argument("-d", "--delete", help="Delete older files (default 30 days)", nargs='?', const=30, type=int,
                         default=30)
     args = parser.parse_args()
 
     global downloadpath
     downloadpath = args.path
 
-    global proxy
-    proxy = args.proxy
+    global myproxy
+    myproxy = args.proxy
 
     aging = args.delete
 
-    if args.downloaddelta or args.downloadfull:
+    if args.downloaddelta or args.downloadfull or args.downloadall:
         html_string = checkFiles()
-        p = re.compile(r".+FiasCompleteXmlUrl>(http://[^<]+)</.+", re.IGNORECASE)
-        results = p.search(html_string)
-        urllastfull = results.group(1)
+        if not html_string == "":
+            metadata = os.path.join(downloadpath, "metadata.xml")
+            with open(metadata,"w") as metadatafile:
+                metadatafile.write(html_string)
 
-        p = re.compile(r".+FiasDeltaXmlUrl>(http://[^<]+)</.+", re.IGNORECASE)
-        results = p.search(html_string)
-        urllastdelta = results.group(1)
+            p = re.compile(r".+FiasCompleteXmlUrl>(http://[^<]+)</.+", re.IGNORECASE)
+            results = p.search(html_string)
+            urllastfull = results.group(1)
 
-        p = re.compile(r".+VersionId>([0-9]+)</.+", re.IGNORECASE)
-        results = p.search(html_string)
-        version = results.group(1)
+            p = re.compile(r".+FiasDeltaXmlUrl>(http://[^<]+)</.+", re.IGNORECASE)
+            results = p.search(html_string)
+            urllastdelta = results.group(1)
 
-        print "Last Version:{0} Lastfull:{1} Lastdelta:{2}".format(version, urllastfull, urllastfull)
+            p = re.compile(r".+VersionId>([0-9]+)</.+", re.IGNORECASE)
+            results = p.search(html_string)
+            version = results.group(1)
 
-    if args.downloaddelta:
+            print "Last Version:{0} Lastfull:{1} Lastdelta:{2}".format(version, urllastfull, urllastfull)
+
+    if html_string != "" and ( args.downloaddelta or args.downloadall ):
         downloadLastDelta(url=urllastdelta)
 
-    if args.downloadfull:
+    if html_string != "" and ( args.downloadfull or args.downloadall ):
         downloadLastFull(url=urllastfull)
 
     cleanupOldFiles(aging=aging)
