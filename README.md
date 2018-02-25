@@ -4,7 +4,7 @@ Coded by: redcorjo
 
 Date    : 20180225
 
-This script is used to download all full and deltas from FIAS site
+This script is used to download all full and deltas from FIAS site http://fias.nalog.ru
 
 usage: FIASFileDownloader.py [-h] [--version] [-df] [-dd] [-da] [-x [PROXY]]
 
