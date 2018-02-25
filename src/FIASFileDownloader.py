@@ -8,6 +8,10 @@ import argparse
 import rarfile
 
 def checkFiles():
+    """
+    Check last version of files to download from fias.nalog.ru using avaiable SOAP APIs from site
+    :return:
+    """
     url = "http://fias.nalog.ru/WebServices/Public/DownloadService.asmx?WSDL"
 
     post_data = """
@@ -29,15 +33,6 @@ def checkFiles():
 
     request_object = urllib2.Request(url, post_data, http_headers)
 
-    # # #IF YOU ARE NOT BEHIND A PROXY, DELETE THIS BLOCK
-    # http_proxy_server = "127.0.0.1"
-    # http_proxy_port = "3128"
-    # http_proxy_realm = http_proxy_server
-    # http_proxy_full_auth_string = "http://%s:%s" % (http_proxy_server, http_proxy_port)
-    # proxy = urllib2.ProxyHandler({'http': http_proxy_full_auth_string})
-    # opener = urllib2.build_opener(proxy)
-    # urllib2.install_opener(opener)
-    # # #END OF --> IF YOU ARE NOT BEHIND A PROXY, DELETE THIS BLOCK
     if myproxy:
         useProxy()
 
@@ -50,7 +45,10 @@ def checkFiles():
     return html_string
 
 def useProxy():
-    # #IF YOU ARE NOT BEHIND A PROXY, DELETE THIS BLOCK
+    """
+    Implement HTTP proxy for outbound access
+    :return:
+    """
     http_proxy_server = myproxy.split(":")[0]
     http_proxy_port = myproxy.split(":")[1]
     http_proxy_realm = http_proxy_server
@@ -58,9 +56,13 @@ def useProxy():
     proxy = urllib2.ProxyHandler({'http': http_proxy_full_auth_string})
     opener = urllib2.build_opener(proxy)
     urllib2.install_opener(opener)
-    # #END OF --> IF YOU ARE NOT BEHIND A PROXY, DELETE THIS BLOCK
 
 def downloadLastDelta(url=""):
+    """
+    Method used to download the last delta file using predefined hardened link
+    :param url:
+    :return:
+    """
     if url == "":
         url_delta = "http://fias.nalog.ru/Public/Downloads/Actual/fias_delta_xml.rar"
     else:
@@ -72,6 +74,11 @@ def downloadLastDelta(url=""):
     pass
 
 def downloadLastFull(url=""):
+    """
+    Method used to download the last delta file using predefined hardened link
+    :param url:
+    :return:
+    """
     if url == "":
         url_full = "http://fias.nalog.ru/Public/Downloads/Actual/fias_xml.rar"
     else:
@@ -85,6 +92,12 @@ def downloadLastFull(url=""):
     pass
 
 def downloadfile(url, filename):
+    """
+    Method to download files. Only suitable when files are not large
+    :param url:
+    :param filename:
+    :return:
+    """
     # Open the url
     print "Downloading file {0} from URL {1}".format(filename,url)
     try:
@@ -101,24 +114,20 @@ def downloadfile(url, filename):
         print "URL Error:", e.reason, url
 
 def downloadLargeFile(url, filename):
-    """Helper to download large files
-        the only arg is a url
-       this file will go to a temp directory
-       the file will also be downloaded
-       in chunks and print out how much remains
+    """
+    Method used to download large files by chunks of data
+    :param url:
+    :param filename:
+    :return:
     """
 
     baseFile = os.path.basename(url)
 
-    # move the file to a more uniq path
-    #os.umask(0002)
-    #temp_path = "./downloads"
     temp_path = downloadpath
     if not os.path.exists(temp_path):
         os.makedirs(temp_path)
     baselinetime = time.time()
     try:
-        #file = os.path.join(temp_path, baseFile)
         file = os.path.join(temp_path, filename)
 
         if myproxy:
@@ -161,6 +170,11 @@ def downloadLargeFile(url, filename):
     return file
 
 def unrarFile(filename):
+    """
+    Method to unrar the file. It uses python module unrar, and binary unrar at OS
+    :param filename:
+    :return:
+    """
     rf = rarfile.RarFile(filename)
     for f in rf.infolist():
         print f.filename, f.file_size
@@ -168,13 +182,15 @@ def unrarFile(filename):
             rf.extract(f.filename,path=downloadpath)
         except Exception,e:
             print "Exception {0} for file {1}".format(str(e),f.filename)
-        #print(rf.read(f))
-        # if f.filename == 'README':
-        #     print(rf.read(f))
     rf.close()
 
 
 def cleanupOldFiles(aging=40):
+    """
+    Method to cleanup (housekeep) older files
+    :param aging:
+    :return:
+    """
     print "Purging files older than {0} days from folder {1}".format(aging, downloadpath)
     if os.path.exists(downloadpath) and os.path.isdir(downloadpath):
         now = time.time()
@@ -189,8 +205,12 @@ def cleanupOldFiles(aging=40):
         print "Path not valid"
 
 def main():
+    """
+    Main entry point to the execution
+    :return:
+    """
     parser = argparse.ArgumentParser()
-    parser.add_argument('--version', action='version', version='%(prog)s 0.3')
+    parser.add_argument('--version', action='version', version='%(prog)s 0.4')
     parser.add_argument("-df","--downloadfull", help="Download Full database", action="store_true")
     parser.add_argument("-dd","--downloaddelta", help="Download last delta database", action="store_true")
     parser.add_argument("-da", "--downloadall", help="Download last Full and last Delta database", action="store_true")

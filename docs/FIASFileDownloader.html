@@ -1,0 +1,61 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module FIASFileDownloader</title>
+<meta charset="utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>FIASFileDownloader</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/jordiredondo/PycharmProjects/FIASFileDownloader/src/FIASFileDownloader.py">/Users/jordiredondo/PycharmProjects/FIASFileDownloader/src/FIASFileDownloader.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="argparse.html">argparse</a><br>
+<a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="rarfile.html">rarfile</a><br>
+<a href="re.html">re</a><br>
+</td><td width="25%" valign=top><a href="time.html">time</a><br>
+<a href="urllib2.html">urllib2</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-checkFiles"><strong>checkFiles</strong></a>()</dt><dd><tt>Check&nbsp;last&nbsp;version&nbsp;of&nbsp;files&nbsp;to&nbsp;download&nbsp;from&nbsp;fias.nalog.ru&nbsp;using&nbsp;avaiable&nbsp;SOAP&nbsp;APIs&nbsp;from&nbsp;site<br>
+:return:</tt></dd></dl>
+ <dl><dt><a name="-cleanupOldFiles"><strong>cleanupOldFiles</strong></a>(aging<font color="#909090">=40</font>)</dt><dd><tt>Method&nbsp;to&nbsp;cleanup&nbsp;(housekeep)&nbsp;older&nbsp;files<br>
+:param&nbsp;aging:<br>
+:return:</tt></dd></dl>
+ <dl><dt><a name="-downloadLargeFile"><strong>downloadLargeFile</strong></a>(url, filename)</dt><dd><tt>Method&nbsp;used&nbsp;to&nbsp;download&nbsp;large&nbsp;files&nbsp;by&nbsp;chunks&nbsp;of&nbsp;data<br>
+:param&nbsp;url:<br>
+:param&nbsp;filename:<br>
+:return:</tt></dd></dl>
+ <dl><dt><a name="-downloadLastDelta"><strong>downloadLastDelta</strong></a>(url<font color="#909090">=''</font>)</dt><dd><tt>Method&nbsp;used&nbsp;to&nbsp;download&nbsp;the&nbsp;last&nbsp;delta&nbsp;file&nbsp;using&nbsp;predefined&nbsp;hardened&nbsp;link<br>
+:param&nbsp;url:<br>
+:return:</tt></dd></dl>
+ <dl><dt><a name="-downloadLastFull"><strong>downloadLastFull</strong></a>(url<font color="#909090">=''</font>)</dt><dd><tt>Method&nbsp;used&nbsp;to&nbsp;download&nbsp;the&nbsp;last&nbsp;delta&nbsp;file&nbsp;using&nbsp;predefined&nbsp;hardened&nbsp;link<br>
+:param&nbsp;url:<br>
+:return:</tt></dd></dl>
+ <dl><dt><a name="-downloadfile"><strong>downloadfile</strong></a>(url, filename)</dt><dd><tt>Method&nbsp;to&nbsp;download&nbsp;files.&nbsp;Only&nbsp;suitable&nbsp;when&nbsp;files&nbsp;are&nbsp;not&nbsp;large<br>
+:param&nbsp;url:<br>
+:param&nbsp;filename:<br>
+:return:</tt></dd></dl>
+ <dl><dt><a name="-main"><strong>main</strong></a>()</dt><dd><tt>Main&nbsp;entry&nbsp;point&nbsp;to&nbsp;the&nbsp;execution<br>
+:return:</tt></dd></dl>
+ <dl><dt><a name="-unrarFile"><strong>unrarFile</strong></a>(filename)</dt><dd><tt>Method&nbsp;to&nbsp;unrar&nbsp;the&nbsp;file.&nbsp;It&nbsp;uses&nbsp;python&nbsp;module&nbsp;unrar,&nbsp;and&nbsp;binary&nbsp;unrar&nbsp;at&nbsp;OS<br>
+:param&nbsp;filename:<br>
+:return:</tt></dd></dl>
+ <dl><dt><a name="-useProxy"><strong>useProxy</strong></a>()</dt><dd><tt>Implement&nbsp;HTTP&nbsp;proxy&nbsp;for&nbsp;outbound&nbsp;access<br>
+:return:</tt></dd></dl>
+</td></tr></table>
+</body></html>
