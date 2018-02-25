@@ -3,9 +3,16 @@ import os
 from urllib2 import urlopen, URLError, HTTPError
 import time
 import re
+import sys
 import argparse
-# https://pypi.python.org/pypi/rarfile
-import rarfile
+
+try:
+    sys.path.extend("rarfile-3.0-py2.7.egg")
+    # https://pypi.python.org/pypi/rarfile
+    import rarfile
+except:
+    print "Cannot import rarfile module"
+    sys.exit(-1)
 
 def checkFiles():
     """
@@ -54,6 +61,7 @@ def useProxy():
     http_proxy_realm = http_proxy_server
     http_proxy_full_auth_string = "http://%s:%s" % (http_proxy_server, http_proxy_port)
     proxy = urllib2.ProxyHandler({'http': http_proxy_full_auth_string})
+    print "Using proxy {0}".format(http_proxy_full_auth_string)
     opener = urllib2.build_opener(proxy)
     urllib2.install_opener(opener)
 
